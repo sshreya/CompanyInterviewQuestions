@@ -1,0 +1,36 @@
+𝐇𝐞𝐫𝐞'𝐬 𝐭𝐡𝐞 𝐪𝐮𝐞𝐬𝐭𝐢𝐨𝐧:
+
+Determine how the number of drivers that have churned changed in each year compared to the previous one. Output the year (specifically, using the year the driver left Lyft) along with the corresponding number of churns in that year, the number of churns in the previous year, and an indication of whether the number has increased ('increase'), decreased ('decrease'), or stayed the same ('no change').
+
+𝐓𝐚𝐛𝐥𝐞(𝐬):
++--------------+---------+
+| Column Name | Type |
++--------------+---------+
+index Identifier of driver
+start_date Start date
+end_date End date
+yearly_salary Salary per year
++--------------+---------+
+
+Solution:
+with get_churn_num as(
+select
+  extract(year from end_date) as year_driver_churned,
+  count(index) as n_churned
+from 
+  lyft_drivers
+where end_date is not null
+group by extract(year from end_date)
+order by year_driver_churned
+)
+select 
+  *,
+  lag(n_churned,1,0)over(order by year_driver_churned) as n_churned_prev,
+  case 
+    when n_churned > lag(n_churned,1,0)over(order by year_driver_churned) then 'increase'
+    when n_churned < lag(n_churned,1,0)over(order by year_driver_churned) then 'decrease'
+    else 'no_change'
+  end as churn_trend 
+from 
+  get_churn_num
+;
