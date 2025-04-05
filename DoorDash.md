@@ -5,6 +5,8 @@ Write a SQL query to calculate the % of high-frequency customers for January 202
 Round your results to 2 decimal points.
 
 Solution:
+
+```sql
 with cte as(
 select 
   customer_id,
@@ -20,3 +22,4 @@ select
 round((select count(customer_id) from cte where cnt > 5) * 1.0/ count(customer_id),2) as ratio
 from cte
 ;
+```
